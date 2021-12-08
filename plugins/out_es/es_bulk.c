@@ -67,6 +67,7 @@ int es_bulk_append(struct es_bulk *bulk, char *index, int i_len,
     int append_size;
     int required;
     char *ptr;
+    int available2;
 
     required = j_len + ES_BULK_HEADER + 1;
     available = (bulk->size - bulk->len);
@@ -97,6 +98,10 @@ int es_bulk_append(struct es_bulk *bulk, char *index, int i_len,
         }
         bulk->ptr  = ptr;
         bulk->size += append_size;
+        available2 = (bulk->size - bulk->len);
+        if (available2 < required) {
+            flb_debug("[out_es] required size (%d, append: %d) is still superior to available buffer (%d, previous available: %d)", required, append_size, available2, available);
+        }
     }
 
     memcpy(bulk->ptr + bulk->len, index, i_len);
